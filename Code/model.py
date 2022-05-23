@@ -27,8 +27,8 @@ class CNN_Network(nn.Module):
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
 
         self.fc1 = nn.Linear(10240, 4096)
-        self.fc2 = nn.Linear(4096, 4096)
-        self.fc3 = nn.Linear(4096, 6)
+        self.fc2 = nn.Linear(4096, 1024)
+        self.fc3 = nn.Linear(1024, 6)
 
     def forward(self, x):
         x = F.relu(self.conv1_1(x))
@@ -54,5 +54,5 @@ class CNN_Network(nn.Module):
         x = F.dropout(x, 0.5) #dropout was included to combat overfitting
         x = F.relu(self.fc2(x))
         x = F.dropout(x, 0.5)
-        output = F.sigmoid(self.fc3(x))
+        output = self.fc3(x)
         return output

@@ -1,16 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
+import time
 import torch.nn as nn
 from gen_dataset import Braille_Dataset
 from sampler import BalancedBatchSampler
 from model import CNN_Network
+from sklearn.metrics import confusion_matrix
+import seaborn as sn
+import pandas as pd
+
 
 if __name__ == '__main__':
-    BATCH_SIZE = 32
+    BATCH_SIZE = 128
     FC_UNITS = [9216, 128, 6]
-    lr = 1e-4
-    max_epoch = 10
+    lr = 1e-5
+    max_epoch = 70
     model_name = "model_only_depth"
 
     dataset = Braille_Dataset(path_data='./data/', resize=True)
@@ -31,13 +36,15 @@ if __name__ == '__main__':
     loss_list = []
     acc_list = []
 
+    time_start = time.time()
+
     for epoch in range(0, max_epoch):
         model.train()
         loss_train = 0
         n_right_train = 0
 
         for step, sample_batched in enumerate(train_dataloader):
-            # rgb = sample_batched['rgb'] 
+            rgb = sample_batched['rgb'] 
             depth = sample_batched['depth']
             ytrue = sample_batched['label']
 
@@ -76,6 +83,10 @@ if __name__ == '__main__':
                 print ('==================================================================')
                 print ('[TRAIN set] Epoch {}, Step {}, Loss: {:.6f}, , Acc: {:.4f}'
                        .format(epoch, step + 1, loss_train_reduced, train_accuracy))
+
+    time_end = time.time()
+    enlapse_time = (time_end - time_start) / 3600.
+    print(f"Enlapse time training: {enlapse_time} hours")
             
     plt.figure()
     plt.subplot(211)
@@ -88,3 +99,57 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.xlabel('Iterations')
     plt.show()
+    plt.savefig('learning_curve.jpg')
+
+    torch.save(model.state_dict(), 'braille_model.pth')
+
+    # # evaluate the model on test dataset
+    # y_pred = []
+    # y_true = []
+
+    # # iterate over test data
+    # model.eval()
+    # for sample_batched in train_dataloader:
+    #     depth = sample_batched['depth']
+    #     ytrue = sample_batched['label']
+
+    #     idx = torch.randperm(ytrue.shape[0])
+    #     depth = depth[idx].view(depth.size())
+    #     ytrue = ytrue[idx].view(ytrue.size())
+        
+    #     # rgb = torch.transpose(rgb, 1, 3)
+    #     depth = torch.transpose(depth, 1, 3)
+    #     if torch.cuda.is_available():
+    #         # rgb = rgb.type(torch.cuda.FloatTensor)
+    #         depth = depth.type(torch.cuda.FloatTensor)
+    #         ytrue = ytrue.type(torch.cuda.LongTensor)
+
+    #     output = model(depth) # Feed Network
+
+    #     # output = (torch.max(torch.exp(output), 1)[1]).data.cpu().numpy()
+    #     _, output = torch.max(output, 1)
+    #     output = output.data.cpu().numpy()
+    #     y_pred.extend(output) # Save Prediction
+        
+    #     labels = ytrue.squeeze().data.cpu().numpy()
+    #     y_true.extend(labels) # Save Truth
+
+    # # constant for classes
+    # classes = dataset.labels
+
+    # # Build confusion matrix
+    # cf_matrix = confusion_matrix(y_true, y_pred)
+    # df_cm = pd.DataFrame(cf_matrix/np.sum(cf_matrix) *10, index = [i for i in classes],
+    #                     columns = [i for i in classes])
+    # plt.figure(figsize = (12,7))
+    # sn.heatmap(df_cm, annot=True)
+    # plt.show()
+    # plt.savefig('confusion_matrix.png')
+
+
+
+    #TODO
+    # ADD VALIDATION/ TEST DATASET
+    # CONFUSION MATRIX
+    # SAVE BEST MODEL
+    # EARLY STOPPING
