@@ -125,30 +125,27 @@ if __name__ == '__main__':
     model_name = "model_only_depth"
 
 # create train and val dataloaders
-   # with open('/homes/iws/kirstng/CSE576/Project/Braille-Project/gen_data_A-Z_train.pickle','rb') as handle: #me
-    #    train_dataset = pickle.load(handle) #me
-   # with open('/homes/iws/kirstng/CSE576/Project/Braille-Project/gen_data_A-Z_val.pickle','rb') as handle: #me
-   #     val_dataset = pickle.load(handle) #me
- #   with open('/homes/iws/kirstng/Braille-Project/gen_data_A-Z_test.pickle','rb') as handle: #me
- #       test_dataset = pickle.load(handle) #me
+   # we can change the type of augmentations here
     aug_param =transforms.Compose([transforms.ToTensor(),transforms.Normalize(0.5,0.5)])
-    train_dataset_1 = Braille_Dataset(path_data='/Users/Kirsteenng_1/Desktop/UW courses/MSDS/Spring 2022/CSE 576/Project/A_Z', resize=True, mode='train',transformer=None)
-    train_dataset_2= Braille_Dataset(path_data='/Users/Kirsteenng_1/Desktop/UW courses/MSDS/Spring 2022/CSE 576/Project/A_Z', resize=True, mode='train',transformer=aug_param)
-    train_dataset_rgb = Braille_Dataset(path_data='/Users/Kirsteenng_1/Desktop/UW courses/MSDS/Spring 2022/CSE 576/Project/A_Z', resize=True, mode='train',transformer=None)
     
+    # augment the data inside Braille_Dataset class and then concatenate together.
+    train_dataset_1 = Braille_Dataset(path_data='./path/', resize=True, mode='train',transformer=None)
+    train_dataset_2= Braille_Dataset(path_data='./path/', resize=True, mode='train',transformer=aug_param)
+    
+    
+    train_dataset_rgb = Braille_Dataset(path_data='./path/', resize=True, mode='train',transformer=None)
     train_dataset_rgb.rgb_dataset = train_dataset_1.rgb_dataset + train_dataset_2.rgb_dataset
     train_dataset_rgb.depth_dataset = train_dataset_1.depth_dataset + train_dataset_2.depth_dataset
     train_dataset_rgb.target_dataset = train_dataset_1.target_dataset + train_dataset_2.target_dataset
     
-   # 
     train_dataloader = torch.utils.data.DataLoader(
                             train_dataset_rgb,
                             sampler=BalancedBatchSampler(train_dataset_rgb.depth_dataset, train_dataset_rgb.target_dataset),
                             batch_size=BATCH_SIZE)
 
-    val_dataset = Braille_Dataset(path_data='/Users/Kirsteenng_1/Desktop/UW courses/MSDS/Spring 2022/CSE 576/Project/A_Z', resize=True, mode='val')
+    val_dataset = Braille_Dataset(path_data='./path/', resize=True, mode='val')
    
-    '''
+ 
     val_dataloader = torch.utils.data.DataLoader(
                             val_dataset,
                             sampler=BalancedBatchSampler(val_dataset.depth_dataset, val_dataset.target_dataset),
@@ -188,7 +185,7 @@ if __name__ == '__main__':
     enlapse_time = (time_end - time_start) / 3600.
     print(f"Enlapse time training: {enlapse_time} hours")
 
-'''
+
     # plot loss and accuracy in training and val data
     plt.figure()
     plt.subplot(211)
@@ -198,7 +195,7 @@ if __name__ == '__main__':
     plt.ylabel('Loss')
     plt.xlabel('Iterations')
     plt.legend()
-    '''
+
     plt.subplot(212)
     plt.plot(acc_train_list, label='Train')
     plt.plot(acc_val_list, label='Val')
@@ -207,7 +204,7 @@ if __name__ == '__main__':
     plt.xlabel('Iterations')
     plt.legend()
     plt.savefig('learning_curve_all.jpg')
-    '''
+
     # save model
    # torch.save(model.state_dict(), 'braille_model_all.pth')
 
