@@ -6,21 +6,6 @@ import sys
 from torch.utils.data import Dataset
 
 # retake letters S and T
-<<<<<<< HEAD:Code/gen_dataset_aug.py
-letters = ['A', 'B', 'C', 'D', 'E', 'F']
-labels =   list(range(0, len(letters)))
-
-class Braille_Dataset(Dataset):
-    def __init__(self, path_data='/Users/Kirsteenng_1/Desktop/UW courses/MSDS/Spring 2022/CSE 576/Project/A_Z', gray_depth=False, resize=False, mode='train',transformer=None): #mode=['train', 'val', 'test']
-        self.rgb_dataset = []
-        self.depth_dataset = []
-        self.target_dataset= []
-        self.w = 183
-        self.h = 130
-        self.num_classes = len(labels)
-        self.labels = letters
-        self.transformer=transformer
-=======
 letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'U', 'V', 'W', 'X', 'Y', 'Z', "num"]
 labels =   list(range(0, len(letters)))
 
@@ -33,7 +18,7 @@ class Braille_Dataset(Dataset):
         self.h = 260
         self.num_classes = len(labels)
         self.labels = letters
->>>>>>> caf2cc7c4ca884bab1e4ff397c889c229694fbee:Code/gen_dataset.py
+
         print(f'Generating dataset - Mode: {mode}')
         for l in range(len(letters)):
             path = f'{path_data}/{letters[l]}_g2.npz'
@@ -116,11 +101,8 @@ class Braille_Dataset(Dataset):
         return sample
 
 if __name__ == '__main__':
-<<<<<<< HEAD:Code/gen_dataset_aug.py
-    dataset = Braille_Dataset(path_data="/Users/Kirsteenng_1/Desktop/UW courses/MSDS/Spring 2022/CSE 576/Project/A_Z", gray_depth=False, resize=True, mode='test')
-=======
+
     dataset = Braille_Dataset(path_data="./dataset/", gray_depth=False, resize=True, mode='test')
->>>>>>> caf2cc7c4ca884bab1e4ff397c889c229694fbee:Code/gen_dataset.py
     print(f'Length dataset: {dataset.__len__()}')
     sample = dataset.__getitem__(i=0)
     letter = letters[sample['label']]
